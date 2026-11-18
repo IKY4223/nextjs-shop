@@ -8,6 +8,13 @@ updates:
       # one PR for all minor/patch bumps instead of one per package
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # typescript-eslint (via eslint-config-next) does not support TS 7 yet; remove when it does
+      - dependency-name: typescript
+        versions: [">=7"]
+      # keep Node types on the runtime major (CI uses Node 22)
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
     schedule:
