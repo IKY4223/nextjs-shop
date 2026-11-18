@@ -22,6 +22,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run format:check
+      # prisma 7 format has no --check flag: format, then fail if the schema changed
+      - run: npx prisma format && git diff --exit-code prisma/
       - run: npx prisma validate
       - run: npx prisma generate
       - run: npm run lint

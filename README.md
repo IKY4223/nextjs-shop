@@ -33,13 +33,15 @@ npm run dev           # http://localhost:3000
 
 ## Scripts
 
-| Command         | What it does             |
-| --------------- | ------------------------ |
-| `npm run dev`   | Start the dev server     |
-| `npm run build` | Production build         |
-| `npm run start` | Run the production build |
-| `npm run lint`  | Run ESLint               |
+| Command                | What it does                                    |
+| ---------------------- | ----------------------------------------------- |
+| `npm run dev`          | Start the dev server                            |
+| `npm run build`        | Production build                                |
+| `npm run start`        | Run the production build                        |
+| `npm run lint`         | Run ESLint                                      |
+| `npm run format`       | Format code with Prettier and the Prisma schema |
+| `npm run format:check` | Check formatting without changing files         |
 
 ## Workflow
 
-`main` is protected: changes go through a pull request, and CI (lint, type check, build) must pass before merge.
+`main` is protected: changes go through a pull request. Before merge, CI (formatting, lint, type check, build) must pass and CodeQL must report no high-severity alerts.
