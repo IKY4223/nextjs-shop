@@ -25,5 +25,5 @@ jobs:
       - run: npx prisma validate
       - run: npx prisma generate
       - run: npm run lint
-      - run: npx tsc --noEmit
+      # next build also type-checks (it generates route types like LayoutProps first)
       - run: npm run build
