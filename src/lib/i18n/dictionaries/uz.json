@@ -1,8 +1,13 @@
 {
+  "meta": {
+    "siteName": "Mergo",
+    "description": "O\u02BBzbekistondagi yangi va ishlatilgan texnika — bitta qidiruvda."
+  },
   "demo": {
     "banner": "Demo-sayt: mahsulotlar sotilmaydi, narxlar o\u02BBylab topilgan."
   },
   "nav": {
+    "home": "Mergo — bosh sahifa",
     "search": "Qidirish",
     "searchHint": "Ctrl K"
   },
@@ -10,9 +15,20 @@
     "toggle": "Mavzuni almashtirish"
   },
   "lang": {
-    "switch": "Русский"
+    "switch": "Русский",
+    "switchLabel": "Saytni rus tilida ochish"
   },
   "footer": {
     "credits": "Rasm manbalari"
+  },
+  "home": {
+    "title": "Barcha texnika bir joyda",
+    "subtitle": "Do\u02BBkonlardagi yangi va sotuvchilardagi ishlatilgan takliflarni solishtiring.",
+    "searchCta": "Model, brend yoki narxni yozing…"
+  },
+  "notFound": {
+    "title": "Sahifa topilmadi",
+    "text": "Bunday sahifa yo\u02BBq yoki u o\u02BBchirilgan.",
+    "home": "Bosh sahifaga"
   }
 }

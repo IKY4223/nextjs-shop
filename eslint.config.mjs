@@ -25,6 +25,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // local brainstorming / plan-execution scratch (git-ignored)
+    ".superpowers/**",
   ]),
 ]);
 
