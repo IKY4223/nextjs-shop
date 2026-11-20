@@ -12,11 +12,15 @@ const COUNT_FIVE = 5;
 
 describe("formatPrice", () => {
   test("uz uses so\u02BBm with non-breaking spaces", () => {
-    expect(formatPrice(PRICE_4_5_MLN, "uz")).toBe("4\u00A0500\u00A0000\u00A0so\u02BBm");
+    expect(formatPrice(PRICE_4_5_MLN, "uz")).toBe(
+      "4\u00A0500\u00A0000\u00A0so\u02BBm",
+    );
   });
 
   test("ru uses сум with non-breaking spaces", () => {
-    expect(formatPrice(PRICE_4_5_MLN, "ru")).toBe("4\u00A0500\u00A0000\u00A0сум");
+    expect(formatPrice(PRICE_4_5_MLN, "ru")).toBe(
+      "4\u00A0500\u00A0000\u00A0сум",
+    );
   });
 
   test("zero", () => {
@@ -24,7 +28,9 @@ describe("formatPrice", () => {
   });
 
   test("billions (car prices) do not overflow", () => {
-    expect(formatPrice(PRICE_2_8_BLN, "uz")).toBe("2\u00A0800\u00A0000\u00A0000\u00A0so\u02BBm");
+    expect(formatPrice(PRICE_2_8_BLN, "uz")).toBe(
+      "2\u00A0800\u00A0000\u00A0000\u00A0so\u02BBm",
+    );
   });
 });
 
