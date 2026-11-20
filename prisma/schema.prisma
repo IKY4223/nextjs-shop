@@ -17,12 +17,15 @@ enum Role {
   ADMIN
 }
 
-enum OrderStatus {
-  PENDING
-  PAID
-  SHIPPED
-  DELIVERED
-  CANCELLED
+enum Condition {
+  NEW
+  USED
+}
+
+enum OfferSourceType {
+  STORE
+  TELEGRAM
+  CLASSIFIED
 }
 
 model User {
@@ -30,49 +33,47 @@ model User {
   email     String   @unique
   name      String?
   role      Role     @default(USER)
-  orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Product {
-  id          String      @id @default(cuid())
-  name        String
-  slug        String      @unique
-  description String
-  // money is stored in minor units (cents) to avoid float rounding
-  priceCents  Int
-  imageUrl    String?
-  stock       Int         @default(0)
-  orderItems  OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  // category tree lives in code (src/lib/catalog/categories.ts) until an admin panel exists
+  categorySlug    String
+  brand           String
+  name            String
+  // keys and values follow the category's facets
+  specs           Json
+  imageSrc        String?
+  imageAlt        String?
+  imageAuthor     String?
+  imageLicense    String?
+  imageLicenseUrl String?
+  imageSourceUrl  String?
+  offers          Offer[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([categorySlug])
 }
 
-model Order {
-  id         String      @id @default(cuid())
-  // Restrict: a user with orders cannot be deleted, so order history is never lost
-  user       User        @relation(fields: [userId], references: [id], onDelete: Restrict)
-  userId     String
-  status     OrderStatus @default(PENDING)
-  totalCents Int
-  items      OrderItem[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+model Offer {
+  id         String          @id @default(cuid())
+  product    Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+  sourceType OfferSourceType
+  sourceName String
+  condition  Condition
+  // whole UZS; BigInt because car prices exceed the 2.1 billion Int limit
+  priceUzs   BigInt
+  cityUz     String
+  cityRu     String
+  url        String?
+  updatedAt  DateTime
+  createdAt  DateTime        @default(now())
 
-  @@index([userId])
-}
-
-model OrderItem {
-  id             String  @id @default(cuid())
-  order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId        String
-  product        Product @relation(fields: [productId], references: [id], onDelete: Restrict)
-  productId      String
-  quantity       Int
-  // price snapshot at checkout time; later Product.priceCents changes must not alter past orders
-  unitPriceCents Int
-
-  @@unique([orderId, productId])
   @@index([productId])
+  @@index([condition, priceUzs])
 }
