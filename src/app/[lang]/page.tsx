@@ -49,7 +49,7 @@ export default async function HomePage({
         <button
           type="button"
           data-search-trigger
-          className="mx-auto mt-8 flex w-full max-w-xl items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left text-muted shadow-sm hover:border-accent focus-visible:outline-2 focus-visible:outline-accent"
+          className="mx-auto mt-8 flex w-full max-w-xl items-center gap-3 rounded-xl border border-muted bg-surface px-4 py-3 text-left text-muted shadow-sm hover:border-accent focus-visible:outline-2 focus-visible:outline-accent"
         >
           <SearchIcon className="shrink-0 text-accent" />
           <span className="flex-1 truncate">{dict.home.searchCta}</span>

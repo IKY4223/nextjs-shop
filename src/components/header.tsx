@@ -29,7 +29,7 @@ export function Header({
         <button
           type="button"
           data-search-trigger
-          className="ml-auto flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-bg px-3 py-1.5 text-sm text-muted hover:border-accent focus-visible:outline-2 focus-visible:outline-accent sm:ml-4 sm:max-w-md"
+          className="ml-auto flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-muted bg-bg px-3 py-1.5 text-sm text-muted hover:border-accent focus-visible:outline-2 focus-visible:outline-accent sm:ml-4 sm:max-w-md"
         >
           <SearchIcon className="shrink-0" />
           <span className="flex-1 truncate text-left">{dict.nav.search}</span>

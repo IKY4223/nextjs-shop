@@ -44,7 +44,7 @@ export function SortSelect({
               },
             );
         }}
-        className="rounded-lg border border-border bg-surface px-2 py-1 text-text"
+        className="rounded-lg border border-muted bg-surface px-2 py-1 text-text"
       >
         {options.map((key) => (
           <option key={key} value={key}>

@@ -33,7 +33,7 @@ export function LangSwitch({
       hrefLang={other}
       lang={other}
       onClick={go}
-      aria-label={ariaLabel}
+      title={ariaLabel}
       className="rounded-lg px-2 py-1 text-sm text-muted hover:bg-chip hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
     >
       {label}

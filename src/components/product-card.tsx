@@ -68,7 +68,7 @@ export function ProductCard({
           </div>
         </ViewTransition>
         <p className="mt-3 text-xs text-muted">{product.brand}</p>
-        <h3 className="leading-snug font-medium">{product.name}</h3>
+        <h2 className="leading-snug font-medium">{product.name}</h2>
         <ul className="mt-2 flex flex-wrap gap-1">
           {cardChips(category, product, lang).map((chip) => (
             <li key={chip} className="rounded bg-chip px-1.5 font-mono text-xs">

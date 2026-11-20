@@ -68,9 +68,9 @@ async function Listing({
         filters={filters}
         dict={dict.catalog}
       />
-      <section aria-live="polite">
+      <section>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted">
+          <p role="status" className="text-sm text-muted">
             {listings.length}{" "}
             {pluralize(lang, listings.length, dict.catalog.results)}
           </p>

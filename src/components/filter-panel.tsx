@@ -65,19 +65,23 @@ function CheckboxGroup({
   return (
     <fieldset className="border-t border-border py-4 first:border-t-0 first:pt-0">
       <legend className="mb-2 text-sm font-semibold">{legend}</legend>
-      <ul className="space-y-1.5">
+      <ul className="space-y-0.5">
         {options.map((option) => {
           const id = `${idPrefix}-${String(option.value)}`;
           return (
-            <li key={id} className="flex items-center gap-2 text-sm">
-              <input
-                id={id}
-                type="checkbox"
-                checked={selected.includes(option.value)}
-                onChange={() => onToggle(option.value)}
-                className="size-4 accent-[var(--mg-accent)]"
-              />
-              <label htmlFor={id} className="cursor-pointer">
+            <li key={id}>
+              {/* the whole row is the click target: at least 24px tall (WCAG 2.5.8) */}
+              <label
+                htmlFor={id}
+                className="flex min-h-7 cursor-pointer items-center gap-2 text-sm"
+              >
+                <input
+                  id={id}
+                  type="checkbox"
+                  checked={selected.includes(option.value)}
+                  onChange={() => onToggle(option.value)}
+                  className="size-4 accent-[var(--mg-accent)]"
+                />
                 {option.label}
               </label>
             </li>
@@ -137,7 +141,7 @@ export function FilterPanel({
       <button
         type="button"
         onClick={() => dialogRef.current?.showModal()}
-        className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium md:hidden"
+        className="w-full rounded-lg border border-muted bg-surface px-3 py-2 text-sm font-medium md:hidden"
       >
         {dict.filters}
         {count ? ` (${count})` : ""}
@@ -208,7 +212,7 @@ export function FilterPanel({
               defaultValue={filters.priceMin ?? ""}
               onBlur={commitPrice}
               onKeyDown={onPriceKey}
-              className="w-full min-w-0 rounded-lg border border-border bg-bg px-2 py-1 text-sm"
+              className="w-full min-w-0 rounded-lg border border-muted bg-bg px-2 py-1 text-sm"
             />
             <span aria-hidden className="text-muted">
               –
@@ -224,7 +228,7 @@ export function FilterPanel({
               defaultValue={filters.priceMax ?? ""}
               onBlur={commitPrice}
               onKeyDown={onPriceKey}
-              className="w-full min-w-0 rounded-lg border border-border bg-bg px-2 py-1 text-sm"
+              className="w-full min-w-0 rounded-lg border border-muted bg-bg px-2 py-1 text-sm"
             />
           </div>
         </fieldset>

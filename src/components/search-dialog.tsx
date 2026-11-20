@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
@@ -170,7 +169,8 @@ export function SearchDialog({
       onClose={() => setSelected(null)}
       className="mx-auto mt-[10vh] w-[min(40rem,calc(100%-2rem))] rounded-2xl border border-border bg-surface p-0 text-text shadow-2xl backdrop:bg-black/60"
     >
-      <div className="flex items-center gap-2 border-b border-border px-4">
+      {/* the input drops its own outline, so the row shows focus instead (WCAG 2.4.7) */}
+      <div className="flex items-center gap-2 rounded-t-2xl border-b border-border px-4 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-accent">
         <SearchIcon className="shrink-0 text-muted" />
         <input
           ref={inputRef}
@@ -204,7 +204,7 @@ export function SearchDialog({
                 type="button"
                 onClick={() => setRemoved(new Set([...removed, chip.part]))}
                 aria-label={`${dict.search.remove}: ${chip.label}`}
-                className="rounded-full bg-chip px-2.5 py-0.5 text-xs hover:text-accent"
+                className="min-h-6 rounded-full bg-chip px-2.5 py-1 text-xs hover:text-accent focus-visible:outline-2 focus-visible:outline-accent"
               >
                 {chip.label} <span aria-hidden>✕</span>
               </button>
@@ -219,33 +219,32 @@ export function SearchDialog({
         className="max-h-[60vh] overflow-y-auto p-2"
       >
         {hits.map((hit, i) => (
+          // Options hold no links (no nested interactive content, WCAG 4.1.2): the combobox input
+          // keeps focus, arrows move aria-activedescendant, Enter or a click navigates.
           <li
             key={hit.slug}
             id={hitId(i)}
             role="option"
             aria-selected={i === selected}
+            onClick={() => go(`/${lang}/p/${hit.slug}`)}
+            onMouseMove={() => setSelected(i)}
+            className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 ${
+              i === selected ? "bg-chip" : "hover:bg-chip"
+            }`}
           >
-            <Link
-              href={`/${lang}/p/${hit.slug}`}
-              onClick={() => dialogRef.current?.close()}
-              className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 ${
-                i === selected ? "bg-chip" : "hover:bg-chip"
-              }`}
-            >
-              <span className="min-w-0">
-                <span className="block truncate font-medium">
-                  {hit.displayName}
-                </span>
-                <span className="text-xs text-muted">
-                  {categoryName(hit.categorySlug)}
-                </span>
+            <span className="min-w-0">
+              <span className="block truncate font-medium">
+                {hit.displayName}
               </span>
-              {hit.minPriceUzs !== null && (
-                <span className="text-sm whitespace-nowrap text-accent">
-                  {price(dict.catalog.offersFrom, hit.minPriceUzs)}
-                </span>
-              )}
-            </Link>
+              <span className="text-xs text-muted">
+                {categoryName(hit.categorySlug)}
+              </span>
+            </span>
+            {hit.minPriceUzs !== null && (
+              <span className="text-sm whitespace-nowrap text-accent">
+                {price(dict.catalog.offersFrom, hit.minPriceUzs)}
+              </span>
+            )}
           </li>
         ))}
       </ul>

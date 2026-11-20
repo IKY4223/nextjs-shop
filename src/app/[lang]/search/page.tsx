@@ -58,7 +58,7 @@ async function SearchResults({
         dict={dict}
       />
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">
+        <p role="status" className="text-sm text-muted">
           {cards.length} {pluralize(lang, cards.length, dict.catalog.results)}
         </p>
         <SortSelect
