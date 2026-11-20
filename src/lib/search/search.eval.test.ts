@@ -143,6 +143,18 @@ describe("search eval: categories, conditions, URLs", () => {
   });
 });
 
+describe("search index", () => {
+  test("keeps a display name next to the matching form", () => {
+    const doc = index.find(
+      (d) => d.slug === "gskill-trident-z5-rgb-ddr5-32gb-6400",
+    );
+    expect(doc?.displayName).toBe(
+      "G.Skill Trident Z5 RGB DDR5 32GB (2×16) 6400",
+    );
+    expect(doc?.name.startsWith("gskill trident")).toBe(true);
+  });
+});
+
 describe("search eval: robustness", () => {
   test("empty query → no hits", () => {
     expect(run("").hits).toEqual([]);

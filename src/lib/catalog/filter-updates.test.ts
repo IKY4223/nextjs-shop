@@ -3,6 +3,7 @@ import { cpuCategory as cpu } from "./categories";
 import {
   activeFilterCount,
   filtersHref,
+  removableFilterLinks,
   withBrandToggled,
   withConditionToggled,
   withFacetToggled,
@@ -75,5 +76,30 @@ describe("filter updates", () => {
     expect(
       filtersHref("/uz/search", parseFilters(null, { q: "asus" }), null),
     ).toBe("/uz/search?q=asus");
+  });
+
+  test("removableFilterLinks: one link per active common filter, each without it", () => {
+    const f = parseFilters(null, {
+      q: "rtx",
+      condition: "used",
+      priceMax: "5000000",
+    });
+    expect(removableFilterLinks("/ru/search", f)).toEqual([
+      { part: "condition", href: "/ru/search?priceMax=5000000&q=rtx" },
+      { part: "priceMax", href: "/ru/search?condition=used&q=rtx" },
+      { part: "q", href: "/ru/search?condition=used&priceMax=5000000" },
+    ]);
+    expect(removableFilterLinks("/ru/search", parseFilters(null, {}))).toEqual(
+      [],
+    );
+  });
+
+  test("removing q keeps an explicit sort but drops relevance", () => {
+    const desc = parseFilters(null, { q: "rtx", sort: "price-desc" });
+    expect(removableFilterLinks("/uz/search", desc)[0]?.href).toBe(
+      "/uz/search?sort=price-desc",
+    );
+    const rel = parseFilters(null, { q: "rtx" });
+    expect(removableFilterLinks("/uz/search", rel)[0]?.href).toBe("/uz/search");
   });
 });

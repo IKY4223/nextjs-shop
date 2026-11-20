@@ -16,6 +16,8 @@ export interface SearchDoc {
   readonly categorySlug: string;
   /** Matching form of "brand name". */
   readonly name: string;
+  /** "Brand Name" as written, for display. */
+  readonly displayName: string;
   /** Display brand. */
   readonly brand: string;
   /** Matching form of brand, category names, synonyms and spec values. */
@@ -70,6 +72,7 @@ export function buildSearchIndex(
       slug: p.slug,
       categorySlug: p.categorySlug,
       name: toMatching(`${p.brand} ${p.name}`),
+      displayName: `${p.brand} ${p.name}`,
       brand: p.brand,
       keywords: uniqueWords([
         p.brand,

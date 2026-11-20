@@ -84,5 +84,16 @@
     "author": "Muallif",
     "license": "Litsenziya",
     "source": "Manba"
+  },
+  "search": {
+    "title": "Qidiruv",
+    "placeholder": "Model, brend yoki narx: rtx 4070 ishlatilgan 5 mln gacha",
+    "noResults": "Hech narsa topilmadi",
+    "showAll": "Barcha natijalar",
+    "hint": "Enter — barcha natijalar, Esc — yopish",
+    "priceMin": "{price} dan",
+    "priceMax": "{price} gacha",
+    "remove": "Olib tashlash",
+    "query": "So\u02BBrov"
   }
 }

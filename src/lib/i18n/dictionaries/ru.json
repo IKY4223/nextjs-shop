@@ -15,7 +15,7 @@
     "toggle": "Сменить тему"
   },
   "lang": {
-    "switch": "O\u02BBzbekcha",
+    "switch": "Oʻzbekcha",
     "switchLabel": "Открыть сайт на узбекском"
   },
   "footer": {
@@ -90,5 +90,16 @@
     "author": "Автор",
     "license": "Лицензия",
     "source": "Источник"
+  },
+  "search": {
+    "title": "Поиск",
+    "placeholder": "Модель, бренд или цена: rtx 4070 б/у до 5 млн",
+    "noResults": "Ничего не найдено",
+    "showAll": "Все результаты",
+    "hint": "Enter — все результаты, Esc — закрыть",
+    "priceMin": "от {price}",
+    "priceMax": "до {price}",
+    "remove": "Убрать",
+    "query": "Запрос"
   }
 }

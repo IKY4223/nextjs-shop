@@ -4,6 +4,8 @@ import { lang as rootLang } from "next/root-params";
 import { DemoBanner } from "@/components/demo-banner";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { SearchDialog } from "@/components/search-dialog";
+import { getCategories, getSearchIndex } from "@/lib/catalog/data";
 import { fontVariables } from "@/lib/fonts";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isLocale, locales } from "@/lib/i18n/locales";
@@ -35,7 +37,11 @@ export default async function RootLayout({
 }: LayoutProps<"/[lang]">): Promise<React.JSX.Element> {
   const lang = await rootLang();
   if (!isLocale(lang)) notFound();
-  const dict = await getDictionary(lang);
+  const [dict, index, categories] = await Promise.all([
+    getDictionary(lang),
+    getSearchIndex(),
+    getCategories(),
+  ]);
 
   // suppressHydrationWarning: themeInitScript sets data-theme on <html> before React hydrates
   return (
@@ -52,6 +58,12 @@ export default async function RootLayout({
         <Header lang={lang} dict={dict} />
         <main className="flex-1">{children}</main>
         <Footer lang={lang} dict={dict} />
+        <SearchDialog
+          lang={lang}
+          index={index}
+          categories={categories}
+          dict={{ search: dict.search, catalog: dict.catalog }}
+        />
       </body>
     </html>
   );

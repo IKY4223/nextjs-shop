@@ -5,6 +5,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CategoryTile } from "@/components/category-tile";
 import { EmptyState } from "@/components/empty-state";
 import { FilterPanel } from "@/components/filter-panel";
+import { GridSkeleton } from "@/components/grid-skeleton";
 import { ProductCard } from "@/components/product-card";
 import { SortSelect } from "@/components/sort-select";
 import {
@@ -22,8 +23,6 @@ import { getDictionary, type Dictionary } from "@/lib/i18n/dictionaries";
 import { pluralize } from "@/lib/i18n/format";
 import { isLocale, type Locale } from "@/lib/i18n/locales";
 
-const SKELETON_CARDS = 6;
-
 export async function generateStaticParams(): Promise<{ category: string }[]> {
   const categories = await getCategories();
   return categories.map((c) => ({ category: c.slug }));
@@ -39,16 +38,6 @@ export async function generateMetadata({
     title: category.name[lang],
     alternates: localeAlternates(lang, `/c/${slug}`),
   };
-}
-
-function GridSkeleton(): React.JSX.Element {
-  return (
-    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: SKELETON_CARDS }, (_, i) => (
-        <div key={i} className="h-72 animate-pulse rounded-xl bg-chip" />
-      ))}
-    </div>
-  );
 }
 
 /** Reads searchParams, so it streams inside Suspense; the breadcrumbs and title above stay in the static shell. */

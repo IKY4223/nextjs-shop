@@ -33,6 +33,52 @@ export function withFacetToggled(
   };
 }
 
+export type RemovablePart = "condition" | "priceMin" | "priceMax" | "q";
+
+const clearCommon: Readonly<Record<RemovablePart, (f: Filters) => Filters>> = {
+  condition: (f) => ({ ...f, conditions: [] }),
+  priceMin: (f) => ({ ...f, priceMin: null }),
+  priceMax: (f) => ({ ...f, priceMax: null }),
+  q: (f) => ({ ...f, q: "" }),
+};
+
+const isActive: Readonly<Record<RemovablePart, (f: Filters) => boolean>> = {
+  condition: (f) => Boolean(f.conditions.length),
+  priceMin: (f) => f.priceMin !== null,
+  priceMax: (f) => f.priceMax !== null,
+  q: (f) => Boolean(f.q),
+};
+
+/** For the search page chips: each active common filter with a link to the same page without it. */
+export function removableFilterLinks(
+  basePath: string,
+  filters: Filters,
+): { readonly part: RemovablePart; readonly href: string }[] {
+  const parts: readonly RemovablePart[] = [
+    "condition",
+    "priceMin",
+    "priceMax",
+    "q",
+  ];
+  return parts
+    .filter((part) => isActive[part](filters))
+    .map((part) => ({
+      part,
+      // without q, "relevance" means nothing: fall back to the default price order
+      href: filtersHref(
+        basePath,
+        {
+          ...clearCommon[part](filters),
+          sort:
+            part === "q" && filters.sort === "relevance"
+              ? "price-asc"
+              : filters.sort,
+        },
+        null,
+      ),
+    }));
+}
+
 export function withBrandToggled(filters: Filters, brand: string): Filters {
   return { ...filters, brands: toggled(filters.brands, brand) };
 }
