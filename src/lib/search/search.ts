@@ -156,16 +156,13 @@ export function buildSearchUrl(
   parsed: ParsedQuery,
   hits: readonly SearchDoc[],
 ): string {
-  const params = new URLSearchParams(
-    (
-      [
-        ["condition", parsed.condition ?? ""],
-        ["priceMin", parsed.priceMin === null ? "" : String(parsed.priceMin)],
-        ["priceMax", parsed.priceMax === null ? "" : String(parsed.priceMax)],
-        ["q", parsed.text],
-      ] as const
-    ).filter(([, value]) => value),
-  );
+  const entries: [string, string][] = [
+    ["condition", parsed.condition ?? ""],
+    ["priceMin", parsed.priceMin === null ? "" : String(parsed.priceMin)],
+    ["priceMax", parsed.priceMax === null ? "" : String(parsed.priceMax)],
+    ["q", parsed.text],
+  ];
+  const params = new URLSearchParams(entries.filter(([, value]) => value));
   const hitCategories = new Set(hits.map((h) => h.categorySlug));
   const [onlyHitCategory] = hitCategories;
   const category =
