@@ -30,5 +30,35 @@
     "title": "Страница не найдена",
     "text": "Такой страницы нет или её удалили.",
     "home": "На главную"
+  },
+  "catalog": {
+    "filters": "Фильтры",
+    "close": "Закрыть",
+    "reset": "Сбросить фильтры",
+    "brand": "Бренд",
+    "condition": "Состояние",
+    "conditionNew": "Новый",
+    "conditionUsed": "Б/у",
+    "price": "Цена, сум",
+    "priceFrom": "от",
+    "priceTo": "до",
+    "sort": "Сортировка",
+    "sortRelevance": "По релевантности",
+    "sortPriceAsc": "Сначала дешевле",
+    "sortPriceDesc": "Сначала дороже",
+    "results": {
+      "one": "товар",
+      "few": "товара",
+      "many": "товаров",
+      "other": "товара"
+    },
+    "offersFrom": "от {price}",
+    "compare": "Сравнить предложения",
+    "emptyTitle": "Ничего не найдено",
+    "emptyText": "Измените или сбросьте фильтры.",
+    "breadcrumbs": "Навигация",
+    "home": "Главная",
+    "yes": "Да",
+    "no": "Нет"
   }
 }

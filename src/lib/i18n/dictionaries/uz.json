@@ -30,5 +30,32 @@
     "title": "Sahifa topilmadi",
     "text": "Bunday sahifa yo\u02BBq yoki u o\u02BBchirilgan.",
     "home": "Bosh sahifaga"
+  },
+  "catalog": {
+    "filters": "Filtrlar",
+    "close": "Yopish",
+    "reset": "Filtrlarni tozalash",
+    "brand": "Brend",
+    "condition": "Holati",
+    "conditionNew": "Yangi",
+    "conditionUsed": "Ishlatilgan",
+    "price": "Narx, so\u02BBm",
+    "priceFrom": "dan",
+    "priceTo": "gacha",
+    "sort": "Saralash",
+    "sortRelevance": "Mosligi bo\u02BByicha",
+    "sortPriceAsc": "Avval arzonlari",
+    "sortPriceDesc": "Avval qimmatlari",
+    "results": {
+      "other": "ta mahsulot"
+    },
+    "offersFrom": "{price} dan",
+    "compare": "Takliflarni solishtirish",
+    "emptyTitle": "Hech narsa topilmadi",
+    "emptyText": "Filtrlarni o\u02BBzgartiring yoki tozalang.",
+    "breadcrumbs": "Navigatsiya",
+    "home": "Bosh sahifa",
+    "yes": "Ha",
+    "no": "Yo\u02BBq"
   }
 }
