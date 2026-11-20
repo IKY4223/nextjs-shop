@@ -1,0 +1,18 @@
+{
+  "demo": {
+    "banner": "Demo-sayt: mahsulotlar sotilmaydi, narxlar o\u02BBylab topilgan."
+  },
+  "nav": {
+    "search": "Qidirish",
+    "searchHint": "Ctrl K"
+  },
+  "theme": {
+    "toggle": "Mavzuni almashtirish"
+  },
+  "lang": {
+    "switch": "Русский"
+  },
+  "footer": {
+    "credits": "Rasm manbalari"
+  }
+}

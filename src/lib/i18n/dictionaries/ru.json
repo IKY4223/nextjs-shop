@@ -1,0 +1,18 @@
+{
+  "demo": {
+    "banner": "Демо-сайт: товары не продаются, цены выдуманные."
+  },
+  "nav": {
+    "search": "Поиск",
+    "searchHint": "Ctrl K"
+  },
+  "theme": {
+    "toggle": "Сменить тему"
+  },
+  "lang": {
+    "switch": "O\u02BBzbekcha"
+  },
+  "footer": {
+    "credits": "Источники фото"
+  }
+}
