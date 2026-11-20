@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "siteName": "Mergo",
+    "description": "O\u02BBzbekistondagi yangi va ishlatilgan texnika — bitta qidiruvda."
+  },
+  "demo": {
+    "banner": "Demo-sayt: mahsulotlar sotilmaydi, narxlar o\u02BBylab topilgan."
+  },
+  "nav": {
+    "home": "Mergo — bosh sahifa",
+    "search": "Qidirish",
+    "searchHint": "Ctrl K"
+  },
+  "theme": {
+    "toggle": "Mavzuni almashtirish"
+  },
+  "lang": {
+    "switch": "Русский",
+    "switchLabel": "Saytni rus tilida ochish"
+  },
+  "footer": {
+    "credits": "Rasm manbalari"
+  },
+  "home": {
+    "title": "Barcha texnika bir joyda",
+    "subtitle": "Do\u02BBkonlardagi yangi va sotuvchilardagi ishlatilgan takliflarni solishtiring.",
+    "searchCta": "Model, brend yoki narxni yozing…"
+  },
+  "notFound": {
+    "title": "Sahifa topilmadi",
+    "text": "Bunday sahifa yo\u02BBq yoki u o\u02BBchirilgan.",
+    "home": "Bosh sahifaga"
+  },
+  "catalog": {
+    "filters": "Filtrlar",
+    "close": "Yopish",
+    "reset": "Filtrlarni tozalash",
+    "brand": "Brend",
+    "condition": "Holati",
+    "conditionNew": "Yangi",
+    "conditionUsed": "Ishlatilgan",
+    "price": "Narx, so\u02BBm",
+    "priceFrom": "dan",
+    "priceTo": "gacha",
+    "sort": "Saralash",
+    "sortRelevance": "Mosligi bo\u02BByicha",
+    "sortPriceAsc": "Avval arzonlari",
+    "sortPriceDesc": "Avval qimmatlari",
+    "results": {
+      "other": "ta mahsulot"
+    },
+    "offersFrom": "{price} dan",
+    "compare": "Takliflarni solishtirish",
+    "emptyTitle": "Hech narsa topilmadi",
+    "emptyText": "Filtrlarni o\u02BBzgartiring yoki tozalang.",
+    "breadcrumbs": "Navigatsiya",
+    "home": "Bosh sahifa",
+    "yes": "Ha",
+    "no": "Yo\u02BBq"
+  },
+  "product": {
+    "specs": "Xususiyatlar",
+    "offers": "Takliflar",
+    "offersCount": {
+      "other": "ta taklif"
+    },
+    "noOffers": "Hozircha takliflar yo\u02BBq",
+    "goToSeller": "Sotuvchiga o\u02BBtish",
+    "updated": "Yangilangan",
+    "source": {
+      "store": "Do\u02BBkon",
+      "telegram": "Telegram",
+      "classified": "E\u02BClon"
+    }
+  },
+  "go": {
+    "title": "Demo",
+    "text": "Bu demo: bu yerda sotuvchining e\u02BCloniga o\u02BBtiladi",
+    "back": "Mahsulotga qaytish"
+  },
+  "credits": {
+    "title": "Rasm manbalari",
+    "empty": "Hozircha barcha rasmlar — Mergoning o\u02BBz chizmalari.",
+    "author": "Muallif",
+    "license": "Litsenziya",
+    "source": "Manba"
+  },
+  "search": {
+    "title": "Qidiruv",
+    "placeholder": "Model, brend yoki narx: rtx 4070 ishlatilgan 5 mln gacha",
+    "noResults": "Hech narsa topilmadi",
+    "showAll": "Barcha natijalar",
+    "hint": "Enter — barcha natijalar, Esc — yopish",
+    "priceMin": "{price} dan",
+    "priceMax": "{price} gacha",
+    "remove": "Olib tashlash",
+    "query": "So\u02BBrov"
+  }
+}

@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* dark: variant follows the data-theme attribute set by themeInitScript, not the OS setting */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Electric Blue palette (spec §6.4). Dark is the default; every text/background pair is ≥ 4.5:1. */
+:root,
+[data-theme="dark"] {
+  --mg-bg: #0a0e1a;
+  --mg-surface: #111729;
+  --mg-border: #1f2740;
+  --mg-text: #e6ecfa;
+  --mg-muted: #98a2bd;
+  --mg-accent: #60a5fa;
+  --mg-on-accent: #0a0e1a;
+  --mg-used: #f472b6;
+  --mg-chip: #1a2236;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --mg-bg: #f8faff;
+  --mg-surface: #ffffff;
+  --mg-border: #dfe5f5;
+  --mg-text: #0e1530;
+  --mg-muted: #4a5578;
+  --mg-accent: #1d4ed8;
+  --mg-on-accent: #ffffff;
+  --mg-used: #be185d;
+  --mg-chip: #eef2fc;
+  color-scheme: light;
+}
+
+/* without JavaScript the init script never runs: fall back to the OS preference */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --mg-bg: #f8faff;
+    --mg-surface: #ffffff;
+    --mg-border: #dfe5f5;
+    --mg-text: #0e1530;
+    --mg-muted: #4a5578;
+    --mg-accent: #1d4ed8;
+    --mg-on-accent: #ffffff;
+    --mg-used: #be185d;
+    --mg-chip: #eef2fc;
+    color-scheme: light;
+  }
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--mg-bg);
+  --color-surface: var(--mg-surface);
+  --color-border: var(--mg-border);
+  --color-text: var(--mg-text);
+  --color-muted: var(--mg-muted);
+  --color-accent: var(--mg-accent);
+  --color-on-accent: var(--mg-on-accent);
+  --color-used: var(--mg-used);
+  --color-chip: var(--mg-chip);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: var(--mg-bg);
+  color: var(--mg-text);
+}
+
+/* Category icons are monochrome SVG masks so they take the current text colour in both themes. */
+.icon-mask {
+  background-color: currentColor;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+/* View transitions (node_modules/next/dist/docs/01-app/02-guides/view-transitions.md) */
+::view-transition-group(.morph) {
+  animation-duration: 400ms;
+}
+
+::view-transition-image-pair(.morph) {
+  animation-name: via-blur;
+}
+
+@keyframes via-blur {
+  30% {
+    filter: blur(3px);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }
