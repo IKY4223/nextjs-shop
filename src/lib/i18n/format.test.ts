@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { formatPrice, pluralize } from "./format";
+import { formatDate, formatPrice, pluralize } from "./format";
 
 const PRICE_4_5_MLN = 4_500_000;
 const PRICE_ZERO = 0;
@@ -53,5 +53,22 @@ describe("pluralize", () => {
     expect(pluralize("uz", COUNT_FIVE, { other: "ta mahsulot" })).toBe(
       "ta mahsulot",
     );
+  });
+});
+
+describe("formatDate", () => {
+  test("long month, no time zone drift", () => {
+    const ru = formatDate("2026-11-12", "ru");
+    expect(
+      ru.includes("12") && ru.includes("ноябр") && ru.includes("2026"),
+    ).toBe(true);
+    const uz = formatDate("2026-11-01", "uz");
+    expect(
+      uz.includes("1") && uz.includes("noyabr") && uz.includes("2026"),
+    ).toBe(true);
+  });
+
+  test("an invalid date is shown as given", () => {
+    expect(formatDate("not-a-date", "ru")).toBe("not-a-date");
   });
 });

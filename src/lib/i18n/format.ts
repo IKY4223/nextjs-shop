@@ -36,3 +36,27 @@ const pluralRules: Readonly<Record<Locale, Intl.PluralRules>> = {
 export function pluralize(lang: Locale, n: number, forms: PluralForms): string {
   return forms[pluralRules[lang].select(n)] ?? forms.other;
 }
+
+const dateFormatters: Readonly<Record<Locale, Intl.DateTimeFormat>> = {
+  // UTC: the ISO date is a calendar day, not an instant; local zones must not shift it
+  uz: new Intl.DateTimeFormat("uz", {
+    timeZone: "UTC",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }),
+  ru: new Intl.DateTimeFormat("ru", {
+    timeZone: "UTC",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }),
+};
+
+/** "2026-11-12" → "12 ноября 2026 г." / "12-noyabr, 2026"; an unparseable string is returned as is. */
+export function formatDate(isoDate: string, lang: Locale): string {
+  const time = Date.parse(isoDate);
+  return Number.isNaN(time)
+    ? isoDate
+    : dateFormatters[lang].format(new Date(time));
+}

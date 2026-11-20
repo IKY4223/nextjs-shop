@@ -57,5 +57,32 @@
     "home": "Bosh sahifa",
     "yes": "Ha",
     "no": "Yo\u02BBq"
+  },
+  "product": {
+    "specs": "Xususiyatlar",
+    "offers": "Takliflar",
+    "offersCount": {
+      "other": "ta taklif"
+    },
+    "noOffers": "Hozircha takliflar yo\u02BBq",
+    "goToSeller": "Sotuvchiga o\u02BBtish",
+    "updated": "Yangilangan",
+    "source": {
+      "store": "Do\u02BBkon",
+      "telegram": "Telegram",
+      "classified": "E\u02BClon"
+    }
+  },
+  "go": {
+    "title": "Demo",
+    "text": "Bu demo: bu yerda sotuvchining e\u02BCloniga o\u02BBtiladi",
+    "back": "Mahsulotga qaytish"
+  },
+  "credits": {
+    "title": "Rasm manbalari",
+    "empty": "Hozircha barcha rasmlar — Mergoning o\u02BBz chizmalari.",
+    "author": "Muallif",
+    "license": "Litsenziya",
+    "source": "Manba"
   }
 }
