@@ -32,6 +32,14 @@ Stage 1 runs entirely on mock data, so no database is needed yet. For later stag
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require"
 ```
 
+Then create the tables from the committed migration (`prisma/migrations/20261121000000_init`, generated with `prisma migrate diff --from-empty`):
+
+```bash
+npx prisma migrate deploy
+```
+
+Use Neon's direct (non-pooled) connection string for migrations. The app still reads mock data until `src/lib/catalog/data.ts` is switched to Prisma.
+
 ## Where things live
 
 | Path               | What it is                                                                            |
