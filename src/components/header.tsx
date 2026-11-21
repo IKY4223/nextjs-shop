@@ -5,7 +5,7 @@ import { SearchIcon } from "./icons";
 import { LangSwitch } from "./lang-switch";
 import { ThemeToggle } from "./theme-toggle";
 
-/** The search button carries data-search-trigger; the Ctrl+K dialog attaches to every such element. */
+/** The search button carries data-search-trigger; the search dialog opens from every such element. */
 export function Header({
   lang,
   dict,
@@ -33,9 +33,6 @@ export function Header({
         >
           <SearchIcon className="shrink-0" />
           <span className="flex-1 truncate text-left">{dict.nav.search}</span>
-          <kbd className="hidden rounded bg-chip px-1.5 font-mono text-xs sm:inline">
-            {dict.nav.searchHint}
-          </kbd>
         </button>
         <LangSwitch
           lang={lang}

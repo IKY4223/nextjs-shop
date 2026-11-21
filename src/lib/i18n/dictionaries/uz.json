@@ -8,8 +8,7 @@
   },
   "nav": {
     "home": "Mergo — bosh sahifa",
-    "search": "Qidirish",
-    "searchHint": "Ctrl K"
+    "search": "Qidirish"
   },
   "theme": {
     "toggle": "Mavzuni almashtirish"
@@ -56,7 +55,8 @@
     "breadcrumbs": "Navigatsiya",
     "home": "Bosh sahifa",
     "yes": "Ha",
-    "no": "Yo\u02BBq"
+    "no": "Yo\u02BBq",
+    "showResults": "Natijalarni ko\u02BBrsatish ({count})"
   },
   "product": {
     "specs": "Xususiyatlar",

@@ -5,7 +5,10 @@ import { ViewTransition } from "react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CategoryIcon } from "@/components/category-icon";
 import { OfferList } from "@/components/offer-list";
-import { productImageTransitionName } from "@/components/product-card";
+import {
+  productImageShare,
+  productImageTransitionName,
+} from "@/components/product-card";
 import { SpecTable } from "@/components/spec-table";
 import {
   getBreadcrumbs,
@@ -67,7 +70,7 @@ export default async function ProductPage({
       <div className="mt-6 grid gap-8 md:grid-cols-2">
         <ViewTransition
           name={productImageTransitionName(product.slug)}
-          share="morph"
+          share={productImageShare}
           default="none"
         >
           <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl bg-chip">

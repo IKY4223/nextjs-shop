@@ -72,6 +72,7 @@ async function Listing({
         brands={brands}
         filters={filters}
         dict={dict.catalog}
+        resultCount={listings.length}
       />
       <section>
         <QueryChips

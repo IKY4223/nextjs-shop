@@ -38,6 +38,7 @@ interface Extraction<TValue> {
   readonly rest: readonly string[];
 }
 
+const BILLION = 1_000_000_000;
 const MILLION = 1_000_000;
 const THOUSAND = 1_000;
 const NO_MULTIPLIER = 1;
@@ -52,15 +53,36 @@ const SPACE = " ";
 const DECIMAL_POINT = ".";
 
 const UNITS = phraseTable<number>([
+  ["млрд", BILLION],
+  ["mlrd", BILLION],
+  ["milliard", BILLION],
+  ["миллиард", BILLION],
+  ["миллиарда", BILLION],
+  ["миллиардов", BILLION],
   ["млн", MILLION],
   ["mln", MILLION],
   ["million", MILLION],
+  ["millions", MILLION],
   ["миллион", MILLION],
+  ["миллиона", MILLION],
+  ["миллионов", MILLION],
   ["тыс", THOUSAND],
+  ["тысяча", THOUSAND],
+  ["тысячи", THOUSAND],
   ["тысяч", THOUSAND],
   ["ming", THOUSAND],
   ["k", THOUSAND],
 ]);
+/** Currency words carry no search meaning ("до 5 млн сум"): they are dropped before parsing. */
+const CURRENCY_WORDS: readonly string[] = [
+  ...new Set(
+    ["сум", "сума", "сумов", "sum", "so'm", "сўм", "soum", "uzs"].map(
+      normalize,
+    ),
+  ),
+];
+/** Digits per thousands group in "4 500 000". */
+const GROUP_DIGITS = 3;
 /** Russian keywords stand before the amount ("до 5 млн"). */
 const PREFIX_KEYWORDS = phraseTable<PriceRole>([
   ["до", "max"],
@@ -88,6 +110,45 @@ function parseNumberToken(token: string): number | null {
     chars.every((ch) => isDigit(ch) || ch === DECIMAL_POINT);
   const n = Number(token);
   return wellFormed && Number.isFinite(n) ? n : null;
+}
+
+const isDigitsOnly = (token: string): boolean =>
+  token.length > 0 && [...token].every(isDigit);
+
+/** "5000000som" → "5000000": a currency word glued to a number. */
+function unglueCurrency(token: string): string {
+  const suffix = CURRENCY_WORDS.find(
+    (c) =>
+      token.length > c.length &&
+      token.endsWith(c) &&
+      parseNumberToken(token.slice(0, -c.length)) !== null,
+  );
+  return suffix ? token.slice(0, -suffix.length) : token;
+}
+
+const isThousandsGroup = (token: string): boolean =>
+  isDigitsOnly(token) && token.length === GROUP_DIGITS;
+
+/** ["4", "500", "000"] → ["4500000"]: a 1–3 digit number followed by exact 3-digit groups. */
+function mergeDigitGroups(tokens: readonly string[]): string[] {
+  const [first, ...rest] = tokens;
+  if (first === undefined) return [];
+  const firstNonGroup = rest.findIndex((t) => !isThousandsGroup(t));
+  const leadingGroups = firstNonGroup === -1 ? rest.length : firstNonGroup;
+  const canLead = isDigitsOnly(first) && first.length <= GROUP_DIGITS;
+  const groupCount = canLead ? leadingGroups : 0;
+  if (!groupCount) return [first, ...mergeDigitGroups(rest)];
+  return [
+    [first, ...rest.slice(0, groupCount)].join(""),
+    ...mergeDigitGroups(rest.slice(groupCount)),
+  ];
+}
+
+/** Prepares tokens for price parsing: unglue and drop currency words, merge thousands groups. */
+function priceReadyTokens(tokens: readonly string[]): string[] {
+  return mergeDigitGroups(
+    tokens.map(unglueCurrency).filter((t) => !CURRENCY_WORDS.includes(t)),
+  );
 }
 
 /** "mln" → ×1e6; "mlngacha" → ×1e6 with a max suffix; anything else → null. */
@@ -261,7 +322,9 @@ export function parseQuery(
   raw: string,
   categories: readonly Category[],
 ): ParsedQuery {
-  const tokens = applyTermSynonyms(normalize(raw)).split(SPACE).filter(Boolean);
+  const tokens = priceReadyTokens(
+    applyTermSynonyms(normalize(raw)).split(SPACE).filter(Boolean),
+  );
 
   const prices = parsePrices(tokens);
   const afterPrices = tokens.filter((_, i) => !prices.consumed.has(i));

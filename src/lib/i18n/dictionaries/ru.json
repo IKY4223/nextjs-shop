@@ -8,8 +8,7 @@
   },
   "nav": {
     "home": "Mergo — главная",
-    "search": "Поиск",
-    "searchHint": "Ctrl K"
+    "search": "Поиск"
   },
   "theme": {
     "toggle": "Сменить тему"
@@ -59,7 +58,8 @@
     "breadcrumbs": "Навигация",
     "home": "Главная",
     "yes": "Да",
-    "no": "Нет"
+    "no": "Нет",
+    "showResults": "Показать результаты ({count})"
   },
   "product": {
     "specs": "Характеристики",
