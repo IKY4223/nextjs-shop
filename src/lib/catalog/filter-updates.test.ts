@@ -103,3 +103,12 @@ describe("filter updates", () => {
     expect(removableFilterLinks("/uz/search", rel)[0]?.href).toBe("/uz/search");
   });
 });
+
+describe("review fix: q chip on a category page", () => {
+  test("removing q keeps the category's facet params", () => {
+    const f = parseFilters(cpu, { socket: "AM5", q: "x3d" });
+    expect(removableFilterLinks("/ru/c/cpu", f, cpu)).toEqual([
+      { part: "q", href: "/ru/c/cpu?socket=AM5" },
+    ]);
+  });
+});

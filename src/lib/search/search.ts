@@ -1,4 +1,5 @@
 import Fuse, { type FuseResult, type IFuseOptions } from "fuse.js";
+import { offerInRange, type PricedOffer } from "@/lib/catalog/filters";
 import type {
   Category,
   Facet,
@@ -22,7 +23,12 @@ export interface SearchDoc {
   readonly brand: string;
   /** Matching form of brand, category names, synonyms and spec values. */
   readonly keywords: string;
+  /** Cheapest offer; in search results, the cheapest offer that matches the query's condition and price. */
   readonly minPriceUzs: number | null;
+  /** Condition and price of every offer, so search applies the same offer rule as listings (spec §12.8). */
+  readonly offers: readonly PricedOffer[];
+  /** Root … own category slug, so a parent-category word narrows to its whole subtree. */
+  readonly categoryPath: readonly string[];
 }
 
 /** Search-internal document: the doc plus derived matching fields. */
@@ -59,6 +65,31 @@ function specKeywords(facet: Facet, value: SpecValue | undefined): string[] {
   return value === true ? [facet.label.uz, facet.label.ru] : [];
 }
 
+/** Slugs from the root down to `slug`; a broken parent link just ends the path. */
+function categoryPathOf(
+  slug: string,
+  categories: readonly Category[],
+): string[] {
+  const climb = (
+    cur: Category | undefined,
+    seen: ReadonlySet<string>,
+  ): string[] =>
+    cur && !seen.has(cur.slug)
+      ? [
+          ...climb(
+            categories.find((c) => c.slug === cur.parentSlug),
+            new Set([...seen, cur.slug]),
+          ),
+          cur.slug,
+        ]
+      : [];
+  const path = climb(
+    categories.find((c) => c.slug === slug),
+    new Set(),
+  );
+  return path.length ? path : [slug];
+}
+
 export function buildSearchIndex(
   products: readonly Product[],
   offers: readonly Offer[],
@@ -67,8 +98,14 @@ export function buildSearchIndex(
   const offersByProduct = Map.groupBy(offers, (o) => o.productId);
   return products.map((p) => {
     const category = categories.find((c) => c.slug === p.categorySlug);
-    const prices = (offersByProduct.get(p.id) ?? []).map((o) => o.priceUzs);
+    const own = offersByProduct.get(p.id) ?? [];
+    const prices = own.map((o) => o.priceUzs);
     return {
+      offers: own.map((o) => ({
+        condition: o.condition,
+        priceUzs: o.priceUzs,
+      })),
+      categoryPath: categoryPathOf(p.categorySlug, categories),
       slug: p.slug,
       categorySlug: p.categorySlug,
       name: toMatching(`${p.brand} ${p.name}`),
@@ -135,9 +172,22 @@ export function searchProducts(
   parsed: ParsedQuery,
   limit: number = DEFAULT_LIMIT,
 ): SearchDoc[] {
-  const pool = parsed.categorySlug
-    ? index.filter((d) => d.categorySlug === parsed.categorySlug)
-    : index;
+  const conditions = parsed.condition ? [parsed.condition] : [];
+  // Category (any ancestor counts), condition and price narrow the pool before text search;
+  // each kept doc is re-priced by its cheapest matching offer, so "от X" agrees with the chips.
+  const pool = index
+    .filter(
+      (d) =>
+        !parsed.categorySlug || d.categoryPath.includes(parsed.categorySlug),
+    )
+    .flatMap((d) => {
+      const prices = d.offers
+        .filter((o) =>
+          offerInRange(o, conditions, parsed.priceMin, parsed.priceMax),
+        )
+        .map((o) => o.priceUzs);
+      return prices.length ? [{ ...d, minPriceUzs: Math.min(...prices) }] : [];
+    });
   if (!parsed.text) {
     return parsed.categorySlug ? pool.toSorted(byPrice).slice(0, limit) : [];
   }

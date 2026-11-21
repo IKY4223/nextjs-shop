@@ -5,6 +5,7 @@ import { DemoBanner } from "@/components/demo-banner";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { SearchDialog } from "@/components/search-dialog";
+import { ThemeSync } from "@/components/theme-sync";
 import { getCategories, getSearchIndex } from "@/lib/catalog/data";
 import { fontVariables } from "@/lib/fonts";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -54,6 +55,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="flex min-h-full flex-col bg-bg font-sans text-text">
+        <ThemeSync />
         <DemoBanner text={dict.demo.banner} />
         <Header lang={lang} dict={dict} />
         <main className="flex-1">{children}</main>

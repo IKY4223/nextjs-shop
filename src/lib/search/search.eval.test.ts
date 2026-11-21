@@ -179,3 +179,59 @@ describe("search eval: robustness", () => {
     );
   });
 });
+
+const M3 = 3_000_000;
+const M4 = 4_000_000;
+const RTX_5070_CHEAPEST_NEW = 7_030_000;
+const ASUS_PRODUCTS = 5;
+
+const offersOf = (slug: string) =>
+  mockOffers.filter(
+    (o) => o.productId === mockProducts.find((p) => p.slug === slug)?.id,
+  );
+
+describe("review fix: hits honour the price and condition chips", () => {
+  test("rtx до 3 млн → only products with an offer up to 3M, priced by it", () => {
+    const r = run("rtx до 3 млн");
+    expect(r.hits.length).toBeGreaterThan(0);
+    r.hits.forEach((h) => {
+      expect(h.minPriceUzs).not.toBeNull();
+      expect(h.minPriceUzs ?? Infinity).toBeLessThanOrEqual(M3);
+      expect(offersOf(h.slug).some((o) => o.priceUzs <= M3)).toBe(true);
+    });
+  });
+
+  test("видеокарта новая до 4 млн → exactly the GPUs with a new offer up to 4M", () => {
+    const r = run("видеокарта новая до 4 млн");
+    expect(r.slugs.toSorted()).toEqual([
+      "asrock-intel-arc-b580-challenger",
+      "msi-geforce-rtx-4060-ventus",
+      "xfx-speedster-radeon-rx-7600",
+    ]);
+    r.hits.forEach((h) =>
+      expect(h.minPriceUzs ?? Infinity).toBeLessThanOrEqual(M4),
+    );
+  });
+
+  test("новая rtx 5070 → the price shown is the cheapest new one, not the cheaper used", () => {
+    const hit = run("новая rtx 5070").hits.find(
+      (h) => h.slug === "asus-dual-geforce-rtx-5070",
+    );
+    expect(hit?.minPriceUzs).toBe(RTX_5070_CHEAPEST_NEW);
+  });
+});
+
+describe("review fix: parent-category words narrow, never empty", () => {
+  test.each(["комплектующие asus", "техника asus", "texnika asus"])(
+    "%j → the 5 ASUS products",
+    (query) => {
+      const r = run(query);
+      expect(r.hits).toHaveLength(ASUS_PRODUCTS);
+      r.hits.forEach((h) => expect(h.brand).toBe("ASUS"));
+    },
+  );
+
+  test("Enter on a parent category goes to that category page with q", () => {
+    expect(run("комплектующие asus").path).toBe("/uz/c/pc-components");
+  });
+});

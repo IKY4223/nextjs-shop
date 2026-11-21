@@ -53,9 +53,6 @@ export default async function HomePage({
         >
           <SearchIcon className="shrink-0 text-accent" />
           <span className="flex-1 truncate">{dict.home.searchCta}</span>
-          <kbd className="hidden rounded bg-chip px-1.5 font-mono text-xs sm:inline">
-            {dict.nav.searchHint}
-          </kbd>
         </button>
       </section>
 

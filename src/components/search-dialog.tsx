@@ -31,15 +31,15 @@ interface Chip {
 }
 
 const RESULT_LIMIT = 8;
-const OPEN_KEY = "k";
 const PRICE_PLACEHOLDER = "{price}";
 const TRIGGER_SELECTOR = "[data-search-trigger]";
 const RESULTS_ID = "search-results";
 const hitId = (i: number): string => `search-hit-${i}`;
 
 /**
- * Ctrl+K / ⌘K or any [data-search-trigger] opens it. Native modal <dialog>: Esc closes and the
- * rest of the page is inert, so Tab stays inside. Search runs in the browser over the prebuilt index.
+ * Any [data-search-trigger] opens it (no Ctrl+K: browsers keep that shortcut for their own search).
+ * Native modal <dialog>: Esc or a click outside closes it, and the rest of the page is inert, so Tab
+ * stays inside. Search runs in the browser over the prebuilt index.
  */
 export function SearchDialog({
   lang,
@@ -74,15 +74,6 @@ export function SearchDialog({
       if (dialog && !dialog.open) dialog.showModal();
       inputRef.current?.focus();
     };
-    const onKey = (event: globalThis.KeyboardEvent): void => {
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        event.key.toLowerCase() === OPEN_KEY
-      ) {
-        event.preventDefault();
-        open();
-      }
-    };
     const onClick = (event: MouseEvent): void => {
       if (
         event.target instanceof Element &&
@@ -90,12 +81,8 @@ export function SearchDialog({
       )
         open();
     };
-    window.addEventListener("keydown", onKey);
     document.addEventListener("click", onClick);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.removeEventListener("click", onClick);
-    };
+    return () => document.removeEventListener("click", onClick);
   }, []);
 
   const go = (href: string): void => {
@@ -167,6 +154,10 @@ export function SearchDialog({
       ref={dialogRef}
       aria-label={dict.search.title}
       onClose={() => setSelected(null)}
+      // a click on the backdrop targets the <dialog> itself (its content box has no padding)
+      onClick={(event) => {
+        if (event.target === event.currentTarget) event.currentTarget.close();
+      }}
       className="mx-auto mt-[10vh] w-[min(40rem,calc(100%-2rem))] rounded-2xl border border-border bg-surface p-0 text-text shadow-2xl backdrop:bg-black/60"
     >
       {/* the input drops its own outline, so the row shows focus instead (WCAG 2.4.7) */}

@@ -89,11 +89,27 @@ body {
   }
 }
 
+/* Mobile filter sheet: a short fade-up instead of the browser's default slide from the side */
+.filter-sheet[open] {
+  animation: sheet-in 180ms ease-out;
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*),
   ::view-transition-group(*) {
     animation-duration: 0s !important;
     animation-delay: 0s !important;
+  }
+
+  .filter-sheet[open] {
+    animation: none;
   }
 }

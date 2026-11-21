@@ -8,14 +8,13 @@
   },
   "nav": {
     "home": "Mergo — главная",
-    "search": "Поиск",
-    "searchHint": "Ctrl K"
+    "search": "Поиск"
   },
   "theme": {
     "toggle": "Сменить тему"
   },
   "lang": {
-    "switch": "Oʻzbekcha",
+    "switch": "O\u02BBzbekcha",
     "switchLabel": "Открыть сайт на узбекском"
   },
   "footer": {
@@ -59,7 +58,8 @@
     "breadcrumbs": "Навигация",
     "home": "Главная",
     "yes": "Да",
-    "no": "Нет"
+    "no": "Нет",
+    "showResults": "Показать результаты ({count})"
   },
   "product": {
     "specs": "Характеристики",

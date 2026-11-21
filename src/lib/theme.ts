@@ -11,6 +11,20 @@ export function preferenceCookie(name: string, value: string): string {
   return `${name}=${value}; path=/; max-age=${ONE_YEAR_SECONDS}; samesite=lax`;
 }
 
+const COOKIE_SEPARATOR = ";";
+const isTheme = (value: string | undefined): value is Theme =>
+  value !== undefined && (THEMES as readonly string[]).includes(value);
+
+/** Same rule as themeInitScript, for client code: cookie choice, else the OS preference, else dark. */
+export function themeFromCookie(cookie: string, prefersLight: boolean): Theme {
+  const saved = cookie
+    .split(COOKIE_SEPARATOR)
+    .map((part) => part.trim().split("="))
+    .find(([name]) => name === THEME_COOKIE)?.[1];
+  if (isTheme(saved)) return saved;
+  return prefersLight ? "light" : "dark";
+}
+
 /**
  * Runs in <head> before first paint: cookie choice, else the OS preference, else dark.
  * The server never reads the theme cookie (that would make every page dynamic), so this script

@@ -72,10 +72,11 @@ describe("data layer", () => {
     ).toBeGreaterThan(1);
   });
 
-  test("a parent category lists no products of its own", async () => {
-    expect(await listProducts("pc-components", parseFilters(null, {}))).toEqual(
-      [],
-    );
+  test("a parent category covers its whole subtree", async () => {
+    // the page decides whether to show a grid; the data layer always answers for the subtree
+    expect(
+      await listProducts("pc-components", parseFilters(null, {})),
+    ).toHaveLength(PRODUCT_COUNT);
   });
 
   test("getProduct returns category and every offer sorted by price", async () => {
@@ -104,5 +105,25 @@ describe("data layer", () => {
     expect(await getProductSlugs()).toHaveLength(PRODUCT_COUNT);
     expect(await getSearchIndex()).toHaveLength(PRODUCT_COUNT);
     expect(await getPhotoCredits()).toEqual([]);
+  });
+});
+
+describe("review fix: parent categories cover their subtree", () => {
+  const ASUS_PRODUCTS = 5;
+
+  test("listProducts on a parent with q searches every descendant", async () => {
+    const parent = await getCategory("pc-components");
+    const hits = await listProducts(
+      "pc-components",
+      parseFilters(parent, { q: "asus" }),
+    );
+    expect(hits).toHaveLength(ASUS_PRODUCTS);
+  });
+
+  test("brands of a parent include every descendant's brands", async () => {
+    const brands = await getCategoryBrands("pc-components");
+    expect(brands).toContain("AMD");
+    expect(brands).toContain("Kingston");
+    expect(brands).toContain("Sapphire");
   });
 });

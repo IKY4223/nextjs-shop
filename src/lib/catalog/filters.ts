@@ -200,6 +200,26 @@ const comparators: Readonly<
   "price-desc": (a, b) => b.minPriceUzs - a.minPriceUzs,
 };
 
+/** The part of an offer that condition and price filters look at. */
+export interface PricedOffer {
+  readonly condition: Condition;
+  readonly priceUzs: number;
+}
+
+/** Shared by listings and the search dialog, so both agree on which offers a filter keeps (spec §12.8). */
+export function offerInRange(
+  offer: PricedOffer,
+  conditions: readonly Condition[],
+  priceMin: number | null,
+  priceMax: number | null,
+): boolean {
+  return (
+    (!conditions.length || conditions.includes(offer.condition)) &&
+    (priceMin === null || offer.priceUzs >= priceMin) &&
+    (priceMax === null || offer.priceUzs <= priceMax)
+  );
+}
+
 /**
  * Facets and brand select products; condition and price select offers (spec §12.8).
  * A product is listed only with at least one matching offer, and its summaries count only those.
@@ -219,9 +239,7 @@ export function applyFilters(
     (!filters.brands.length || filters.brands.includes(p.brand));
 
   const offerMatches = (o: Offer): boolean =>
-    (!filters.conditions.length || filters.conditions.includes(o.condition)) &&
-    (filters.priceMin === null || o.priceUzs >= filters.priceMin) &&
-    (filters.priceMax === null || o.priceUzs <= filters.priceMax);
+    offerInRange(o, filters.conditions, filters.priceMin, filters.priceMax);
 
   const candidates: Candidate[] = products
     .filter(productMatches)
