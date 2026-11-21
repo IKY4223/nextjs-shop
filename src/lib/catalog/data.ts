@@ -1,6 +1,6 @@
 /**
  * The only module that knows where catalog data comes from. Pages and components call these
- * async functions; swapping the mocks for Prisma later changes this file alone.
+ * async functions; the rows come from Neon (see ./source) through one cached load.
  */
 import { parseQuery } from "@/lib/search/parse-query";
 import {
@@ -10,8 +10,7 @@ import {
 } from "@/lib/search/search";
 import { categories } from "./categories";
 import { applyFilters, type Filters, type ProductListing } from "./filters";
-import { mockOffers } from "./mock/offers";
-import { mockProducts } from "./mock/products";
+import { loadCatalogRows } from "./source";
 import type { Category, Offer, Product, ProductImage } from "./types";
 
 export interface ProductDetail {
@@ -31,26 +30,41 @@ export interface PhotoCredit {
   readonly image: ProductImage;
 }
 
+interface Catalog {
+  readonly products: readonly Product[];
+  readonly offers: readonly Offer[];
+  readonly searchIndex: readonly SearchDoc[];
+}
+
 /** Upper bound for search hits fed into a listing; the whole stage-1 catalog fits. */
 const SEARCH_HIT_LIMIT = 200;
 
-const searchIndex: readonly SearchDoc[] = buildSearchIndex(
-  mockProducts,
-  mockOffers,
-  categories,
-);
+/** One DB round trip for every page render and build step; Next caches the result (default cache profile). */
+async function loadCatalog(): Promise<Catalog> {
+  "use cache";
+  const { products, offers } = await loadCatalogRows();
+  return {
+    products,
+    offers,
+    searchIndex: buildSearchIndex(products, offers, categories),
+  };
+}
 
 const byPriceAsc = (a: Offer, b: Offer): number => a.priceUzs - b.priceUzs;
 
-const categoryPathBySlug: ReadonlyMap<string, readonly string[]> = new Map(
-  searchIndex.map((d) => [d.slug, d.categoryPath]),
-);
-
 /** A product belongs to its own category and to every ancestor ("Техника" → "Комплектующие" → "Процессоры"). */
-const inSubtree = (product: Product, categorySlug: string): boolean =>
-  (categoryPathBySlug.get(product.slug) ?? [product.categorySlug]).includes(
-    categorySlug,
+function subtreeFilter(
+  catalog: Catalog,
+  categorySlug: string,
+): (product: Product) => boolean {
+  const pathBySlug: ReadonlyMap<string, readonly string[]> = new Map(
+    catalog.searchIndex.map((d) => [d.slug, d.categoryPath]),
   );
+  return (product) =>
+    (pathBySlug.get(product.slug) ?? [product.categorySlug]).includes(
+      categorySlug,
+    );
+}
 
 export async function getCategories(): Promise<readonly Category[]> {
   return categories;
@@ -88,15 +102,16 @@ export async function listProducts(
   filters: Filters,
 ): Promise<ProductListing[]> {
   if (categorySlug !== null && !(await getCategory(categorySlug))) return [];
+  const catalog = await loadCatalog();
   const inCategory =
     categorySlug === null
-      ? mockProducts
-      : mockProducts.filter((p) => inSubtree(p, categorySlug));
-  if (!filters.q) return applyFilters(inCategory, mockOffers, filters);
+      ? catalog.products
+      : catalog.products.filter(subtreeFilter(catalog, categorySlug));
+  if (!filters.q) return applyFilters(inCategory, catalog.offers, filters);
 
   const parsed = parseQuery(filters.q, categories);
   const hits = searchProducts(
-    searchIndex,
+    catalog.searchIndex,
     { ...parsed, categorySlug: categorySlug ?? parsed.categorySlug },
     SEARCH_HIT_LIMIT,
   );
@@ -104,51 +119,54 @@ export async function listProducts(
   const ranked = hits
     .map((h) => bySlug.get(h.slug))
     .filter((p): p is Product => p !== undefined);
-  return applyFilters(ranked, mockOffers, filters);
+  return applyFilters(ranked, catalog.offers, filters);
 }
 
 export async function getProduct(slug: string): Promise<ProductDetail | null> {
-  const product = mockProducts.find((p) => p.slug === slug);
+  const { products, offers } = await loadCatalog();
+  const product = products.find((p) => p.slug === slug);
   const category = categories.find((c) => c.slug === product?.categorySlug);
   if (!product || !category) return null;
   return {
     product,
     category,
-    offers: mockOffers
+    offers: offers
       .filter((o) => o.productId === product.id)
       .toSorted(byPriceAsc),
   };
 }
 
 export async function getOffer(id: string): Promise<OfferDetail | null> {
-  const offer = mockOffers.find((o) => o.id === id);
-  const product = mockProducts.find((p) => p.id === offer?.productId);
+  const { products, offers } = await loadCatalog();
+  const offer = offers.find((o) => o.id === id);
+  const product = products.find((p) => p.id === offer?.productId);
   return offer && product ? { offer, product } : null;
 }
 
 export async function getSearchIndex(): Promise<readonly SearchDoc[]> {
-  return searchIndex;
+  return (await loadCatalog()).searchIndex;
 }
 
 export async function getProductSlugs(): Promise<string[]> {
-  return mockProducts.map((p) => p.slug);
+  return (await loadCatalog()).products.map((p) => p.slug);
 }
 
 export async function getOfferIds(): Promise<string[]> {
-  return mockOffers.map((o) => o.id);
+  return (await loadCatalog()).offers.map((o) => o.id);
 }
 
 /** Every brand in the category, regardless of active filters, so ticking one never hides the others. */
 export async function getCategoryBrands(slug: string): Promise<string[]> {
+  const catalog = await loadCatalog();
   return [
     ...new Set(
-      mockProducts.filter((p) => inSubtree(p, slug)).map((p) => p.brand),
+      catalog.products.filter(subtreeFilter(catalog, slug)).map((p) => p.brand),
     ),
   ].toSorted();
 }
 
 export async function getPhotoCredits(): Promise<PhotoCredit[]> {
-  return mockProducts.flatMap((product) =>
+  return (await loadCatalog()).products.flatMap((product) =>
     product.image ? [{ product, image: product.image }] : [],
   );
 }

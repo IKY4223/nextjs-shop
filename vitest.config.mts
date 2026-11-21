@@ -9,5 +9,7 @@ export default defineConfig({
   test: {
     include: ["src/**/*.test.ts"],
     environment: "node",
+    // unit tests never touch Neon: the data layer reads the mock catalog
+    env: { CATALOG_SOURCE: "mock" },
   },
 });
