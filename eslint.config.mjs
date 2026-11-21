@@ -15,7 +15,7 @@ const eslintConfig = defineConfig([
   { plugins: { "ts-patterns": tsPatternsDirectives } },
   {
     // the stub rule never reports, so ESLint would call every ts-patterns directive "unused"
-    files: ["src/lib/catalog/**/*.ts"],
+    files: ["src/lib/catalog/categories.ts", "src/lib/catalog/mock/*.ts"],
     linterOptions: { reportUnusedDisableDirectives: "off" },
   },
   // Override default ignores of eslint-config-next.

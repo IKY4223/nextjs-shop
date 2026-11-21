@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest";
 import { categories } from "@/lib/catalog/categories";
-import { moveSelection, withoutParts } from "./dialog-state";
+import {
+  dismiss,
+  keptDismissals,
+  moveSelection,
+  withoutParts,
+} from "./dialog-state";
 import { parseQuery } from "./parse-query";
 
 const FIVE_HITS = 5;
@@ -42,5 +47,22 @@ describe("moveSelection", () => {
     [LAST, DOWN, 1, 0],
   ])("from %s by %s of %s → %s", (current, delta, count, expected) => {
     expect(moveSelection(current, delta, count)).toBe(expected);
+  });
+});
+
+describe("keptDismissals", () => {
+  const q = (text: string) => parseQuery(text, categories);
+
+  test("a dismissed chip stays dismissed while its value is unchanged", () => {
+    const dismissed = dismiss(new Map(), q("видюха rtx"), "category");
+    expect([...keptDismissals(dismissed, q("видюха rtx 5"))]).toEqual([
+      "category",
+    ]);
+  });
+
+  test("it comes back when the query now means something else", () => {
+    const dismissed = dismiss(new Map(), q("видюха"), "category");
+    expect([...keptDismissals(dismissed, q("проц"))]).toEqual([]);
+    expect([...keptDismissals(dismissed, q("rtx"))]).toEqual([]);
   });
 });

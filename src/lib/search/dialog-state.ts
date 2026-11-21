@@ -30,3 +30,37 @@ export function moveSelection(
   if (current === null) return delta > 0 ? 0 : count - 1;
   return (current + delta + count) % count;
 }
+
+/** What the user dismissed: each part with the value it had at that moment. */
+export type Dismissals = ReadonlyMap<QueryPart, string | number>;
+
+const partValue: Readonly<
+  Record<QueryPart, (parsed: ParsedQuery) => string | number | null>
+> = {
+  category: (p) => p.categorySlug,
+  condition: (p) => p.condition,
+  priceMin: (p) => p.priceMin,
+  priceMax: (p) => p.priceMax,
+};
+
+/** Records a dismissed chip together with its current value. */
+export function dismiss(
+  dismissals: Dismissals,
+  parsed: ParsedQuery,
+  part: QueryPart,
+): Dismissals {
+  const value = partValue[part](parsed);
+  return value === null ? dismissals : new Map(dismissals).set(part, value);
+}
+
+/** Parts that stay dismissed after a keystroke: only those whose parsed value did not change. */
+export function keptDismissals(
+  dismissals: Dismissals,
+  parsed: ParsedQuery,
+): ReadonlySet<QueryPart> {
+  return new Set(
+    [...dismissals]
+      .filter(([part, value]) => partValue[part](parsed) === value)
+      .map(([part]) => part),
+  );
+}

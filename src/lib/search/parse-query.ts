@@ -202,6 +202,7 @@ const isRange = (a: Amount, b: Amount | undefined): b is Amount =>
 /** The role a lone amount plays, or null if it is not a price at all. */
 function singleRole(amount: Amount): PriceRole | null {
   const price = priceOf(amount, amount.multiplier);
+  if (!Number.isSafeInteger(price)) return null;
   const marked = amount.prefix ?? amount.postfix;
   if (marked) return price >= MIN_MARKED_PRICE ? marked : null;
   if (amount.multiplier !== null) return "max";
@@ -230,12 +231,17 @@ function parsePrices(tokens: readonly string[]): PriceResult {
     .filter((r) => r.role !== null);
   const minAmount = roles.find((r) => r.role === "min")?.amount;
   const maxAmount = roles.find((r) => r.role === "max")?.amount;
+  // "до 5": a keyword-marked amount too small to be a price is still a price phrase, not search text
+  const rejectedMarked = amounts.filter(
+    (a) => (a.prefix ?? a.postfix) !== null && singleRole(a) === null,
+  );
   return {
     priceMin: minAmount ? priceOf(minAmount, minAmount.multiplier) : null,
     priceMax: maxAmount ? priceOf(maxAmount, maxAmount.multiplier) : null,
     consumed: new Set([
       ...(minAmount?.indexes ?? []),
       ...(maxAmount?.indexes ?? []),
+      ...rejectedMarked.flatMap((a) => a.indexes),
     ]),
   };
 }

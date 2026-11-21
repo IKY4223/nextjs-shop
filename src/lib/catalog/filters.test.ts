@@ -214,3 +214,17 @@ describe("applyFilters", () => {
     expect(out.map((l) => l.product.id)).toEqual([p2.id, p1.id]);
   });
 });
+
+describe("review minors", () => {
+  test("prices must be plain digits (no hex, no exponent)", () => {
+    const f = parseFilters(null, { priceMin: "0x10", priceMax: "1e3" });
+    expect([f.priceMin, f.priceMax]).toEqual([null, null]);
+  });
+
+  test("relevance without a query falls back to the default sort", () => {
+    expect(parseFilters(cpu, { sort: "relevance" }).sort).toBe("price-asc");
+    expect(parseFilters(cpu, { sort: "relevance", q: "x" }).sort).toBe(
+      "relevance",
+    );
+  });
+});

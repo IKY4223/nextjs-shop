@@ -14,7 +14,10 @@ import { formatPrice } from "@/lib/i18n/format";
 import type { Locale } from "@/lib/i18n/locales";
 import {
   moveSelection,
+  dismiss,
+  keptDismissals,
   withoutParts,
+  type Dismissals,
   type QueryPart,
 } from "@/lib/search/dialog-state";
 import { parseQuery } from "@/lib/search/parse-query";
@@ -31,6 +34,8 @@ interface Chip {
 }
 
 const RESULT_LIMIT = 8;
+/** Enter decides between a category page and /search from all hits, not only the 8 shown. */
+const ROUTING_HIT_LIMIT = 200;
 const PRICE_PLACEHOLDER = "{price}";
 const TRIGGER_SELECTOR = "[data-search-trigger]";
 const RESULTS_ID = "search-results";
@@ -56,13 +61,13 @@ export function SearchDialog({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
-  const [removed, setRemoved] = useState<ReadonlySet<QueryPart>>(new Set());
+  const [dismissals, setDismissals] = useState<Dismissals>(new Map());
   const [selected, setSelected] = useState<number | null>(null);
 
-  const parsed = useMemo(
-    () => withoutParts(parseQuery(query, categories), removed),
-    [query, categories, removed],
-  );
+  const parsed = useMemo(() => {
+    const raw = parseQuery(query, categories);
+    return withoutParts(raw, keptDismissals(dismissals, raw));
+  }, [query, categories, dismissals]);
   const hits = useMemo(
     () => searchProducts(index, parsed, RESULT_LIMIT),
     [index, parsed],
@@ -95,7 +100,15 @@ export function SearchDialog({
     ArrowUp: () => setSelected(moveSelection(selected, -1, hits.length)),
     Enter: () => {
       const hit = selected === null ? undefined : hits[selected];
-      go(hit ? `/${lang}/p/${hit.slug}` : buildSearchUrl(lang, parsed, hits));
+      go(
+        hit
+          ? `/${lang}/p/${hit.slug}`
+          : buildSearchUrl(
+              lang,
+              parsed,
+              searchProducts(index, parsed, ROUTING_HIT_LIMIT),
+            ),
+      );
     },
   };
   const onInputKey = (event: KeyboardEvent<HTMLInputElement>): void => {
@@ -179,7 +192,6 @@ export function SearchDialog({
           placeholder={dict.search.placeholder}
           onChange={(event) => {
             setQuery(event.target.value);
-            setRemoved(new Set());
             setSelected(null);
           }}
           onKeyDown={onInputKey}
@@ -193,7 +205,15 @@ export function SearchDialog({
             <li key={chip.part}>
               <button
                 type="button"
-                onClick={() => setRemoved(new Set([...removed, chip.part]))}
+                onClick={() =>
+                  setDismissals(
+                    dismiss(
+                      dismissals,
+                      parseQuery(query, categories),
+                      chip.part,
+                    ),
+                  )
+                }
                 aria-label={`${dict.search.remove}: ${chip.label}`}
                 className="min-h-6 rounded-full bg-chip px-2.5 py-1 text-xs hover:text-accent focus-visible:outline-2 focus-visible:outline-accent"
               >

@@ -67,7 +67,12 @@ describe("parseQuery", () => {
     expect(p("процессор видеокарта").categorySlug).toBeNull();
   });
 
-  test("tiny keyword-marked amounts are not prices", () => {
-    expect(p("до 5").priceMax).toBeNull();
+  test("tiny keyword-marked amounts are not prices, and leave no stray words", () => {
+    expect(p("до 5")).toMatchObject({ priceMax: null, text: "" });
+    expect(p("rtx до 5")).toMatchObject({ priceMax: null, text: "rtx" });
+  });
+
+  test("amounts beyond a safe integer are not prices", () => {
+    expect(p("99999999999999999999 сум").priceMax).toBeNull();
   });
 });
