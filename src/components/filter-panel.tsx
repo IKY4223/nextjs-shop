@@ -233,9 +233,10 @@ export function FilterPanel({
           </div>
         </fieldset>
 
-        {count > 0 && (
+        {(count > 0 || Boolean(filters.q)) && (
           <button
             type="button"
+            // reset clears the search text too: it narrows the grid just like a filter
             onClick={() =>
               apply({
                 ...filters,
@@ -244,6 +245,8 @@ export function FilterPanel({
                 conditions: [],
                 priceMin: null,
                 priceMax: null,
+                q: "",
+                sort: filters.sort === "relevance" ? "price-asc" : filters.sort,
               })
             }
             className="mt-2 text-sm text-accent hover:underline"

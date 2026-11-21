@@ -49,10 +49,14 @@ const isActive: Readonly<Record<RemovablePart, (f: Filters) => boolean>> = {
   q: (f) => Boolean(f.q),
 };
 
-/** For the search page chips: each active common filter with a link to the same page without it. */
+/**
+ * Chips for the search and category pages: each active common filter with a link to the same
+ * page without it. Pass the category on a category page so its facet params survive the removal.
+ */
 export function removableFilterLinks(
   basePath: string,
   filters: Filters,
+  category: Category | null = null,
 ): { readonly part: RemovablePart; readonly href: string }[] {
   const parts: readonly RemovablePart[] = [
     "condition",
@@ -74,7 +78,7 @@ export function removableFilterLinks(
               ? "price-asc"
               : filters.sort,
         },
-        null,
+        category,
       ),
     }));
 }

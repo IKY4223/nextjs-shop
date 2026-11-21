@@ -4,25 +4,29 @@ import {
   type RemovablePart,
 } from "@/lib/catalog/filter-updates";
 import type { Filters } from "@/lib/catalog/filters";
+import type { Category } from "@/lib/catalog/types";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { formatPrice } from "@/lib/i18n/format";
 import type { Locale } from "@/lib/i18n/locales";
 
 const PRICE_PLACEHOLDER = "{price}";
 
-/** Active search filters as chips; each one links to the same page without it. */
+/** Active search filters as chips; each one links to the same page without it (spec §7.4). */
 export function QueryChips({
   lang,
   basePath,
   filters,
   dict,
+  category = null,
 }: {
   readonly lang: Locale;
   readonly basePath: string;
   readonly filters: Filters;
   readonly dict: Dictionary;
+  /** On a category page: keeps that page's facet params in each link. */
+  readonly category?: Category | null;
 }): React.JSX.Element | null {
-  const links = removableFilterLinks(basePath, filters);
+  const links = removableFilterLinks(basePath, filters, category);
   if (!links.length) return null;
   const price = (template: string, amount: number | null): string =>
     template.replace(PRICE_PLACEHOLDER, formatPrice(amount ?? 0, lang));

@@ -42,6 +42,16 @@ const searchIndex: readonly SearchDoc[] = buildSearchIndex(
 
 const byPriceAsc = (a: Offer, b: Offer): number => a.priceUzs - b.priceUzs;
 
+const categoryPathBySlug: ReadonlyMap<string, readonly string[]> = new Map(
+  searchIndex.map((d) => [d.slug, d.categoryPath]),
+);
+
+/** A product belongs to its own category and to every ancestor ("Техника" → "Комплектующие" → "Процессоры"). */
+const inSubtree = (product: Product, categorySlug: string): boolean =>
+  (categoryPathBySlug.get(product.slug) ?? [product.categorySlug]).includes(
+    categorySlug,
+  );
+
 export async function getCategories(): Promise<readonly Category[]> {
   return categories;
 }
@@ -81,7 +91,7 @@ export async function listProducts(
   const inCategory =
     categorySlug === null
       ? mockProducts
-      : mockProducts.filter((p) => p.categorySlug === categorySlug);
+      : mockProducts.filter((p) => inSubtree(p, categorySlug));
   if (!filters.q) return applyFilters(inCategory, mockOffers, filters);
 
   const parsed = parseQuery(filters.q, categories);
@@ -132,7 +142,7 @@ export async function getOfferIds(): Promise<string[]> {
 export async function getCategoryBrands(slug: string): Promise<string[]> {
   return [
     ...new Set(
-      mockProducts.filter((p) => p.categorySlug === slug).map((p) => p.brand),
+      mockProducts.filter((p) => inSubtree(p, slug)).map((p) => p.brand),
     ),
   ].toSorted();
 }
