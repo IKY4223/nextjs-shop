@@ -75,9 +75,12 @@ function listParam(params: SearchParamsRecord, key: string): string[] {
 }
 
 /** Whole, non-negative, safe integer; anything else (decimals, "1e30", "-5", "") is null. */
+/** Whole, non-negative, safe integer written as plain digits; "0x10", "1e3", "-5", "2.5", "" are null. */
 function parseCount(raw: string | undefined): number | null {
-  if (!raw?.trim()) return null;
-  const n = Number(raw);
+  const digits = raw?.trim() ?? "";
+  if (!digits || ![...digits].every((ch) => ch >= "0" && ch <= "9"))
+    return null;
+  const n = Number(digits);
   return Number.isSafeInteger(n) && n >= 0 ? n : null;
 }
 
@@ -139,7 +142,9 @@ export function parseFilters(
     conditions: listParam(params, "condition").filter(isCondition),
     priceMin: inverted ? max : min,
     priceMax: inverted ? min : max,
-    sort: isSortKey(sort) ? sort : defaultSort(q),
+    // relevance without search text has nothing to rank by: use the default order instead
+    sort:
+      isSortKey(sort) && (sort !== "relevance" || q) ? sort : defaultSort(q),
     q,
   };
 }

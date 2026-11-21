@@ -53,12 +53,17 @@ async function Listing({
   readonly dict: Dictionary;
   readonly searchParams: Promise<SearchParamsRecord>;
 }): Promise<React.JSX.Element> {
-  const filters = parseFilters(category, await searchParams);
-  const [listings, brands, categories] = await Promise.all([
-    listProducts(category.slug, filters),
+  const parsed = parseFilters(category, await searchParams);
+  const [brands, categories] = await Promise.all([
     getCategoryBrands(category.slug),
     getCategories(),
   ]);
+  // a brand from a stale or hand-edited URL that this category lacks has no checkbox to untick: drop it
+  const filters = {
+    ...parsed,
+    brands: parsed.brands.filter((b) => brands.includes(b)),
+  };
+  const listings = await listProducts(category.slug, filters);
   const basePath = `/${lang}/c/${category.slug}`;
   // on a parent page the products come from several leaves: each card needs its own category
   const categoryOf = (slug: string): Category =>

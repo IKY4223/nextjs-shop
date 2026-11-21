@@ -157,13 +157,18 @@ function FilterControls({
   };
 
   const commitPrice = (): void => {
-    apply(
-      withPriceRange(
-        filters,
-        toPrice(minRef.current?.value ?? ""),
-        toPrice(maxRef.current?.value ?? ""),
-      ),
+    const next = withPriceRange(
+      filters,
+      toPrice(minRef.current?.value ?? ""),
+      toPrice(maxRef.current?.value ?? ""),
     );
+    // tabbing through the inputs must not trigger a navigation when nothing changed
+    if (
+      next.priceMin === filters.priceMin &&
+      next.priceMax === filters.priceMax
+    )
+      return;
+    apply(next);
   };
   const onPriceKey = (event: KeyboardEvent<HTMLInputElement>): void => {
     if (event.key === ENTER_KEY) commitPrice();
