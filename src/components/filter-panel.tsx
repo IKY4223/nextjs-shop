@@ -34,8 +34,39 @@ interface ControlsProps {
   readonly dict: Dictionary["catalog"];
   /** Keeps checkbox ids unique: the sidebar and the mobile sheet render the same controls. */
   readonly scope: string;
+  readonly layout: Layout;
   readonly apply: (next: Filters) => void;
 }
+
+/** "list" for the narrow desktop sidebar; "grid" of big toggle chips for touch in the phone sheet. */
+type Layout = "list" | "grid";
+
+const LAYOUT_STYLES: Readonly<
+  Record<
+    Layout,
+    {
+      readonly list: string;
+      readonly label: string;
+      readonly input: string;
+      readonly price: string;
+    }
+  >
+> = {
+  list: {
+    list: "space-y-0.5",
+    label: "flex min-h-7 cursor-pointer items-center gap-2 text-sm",
+    input: "size-4 accent-[var(--mg-accent)]",
+    price: "px-2 py-1 text-sm",
+  },
+  grid: {
+    list: "grid grid-cols-2 gap-2 min-[26rem]:grid-cols-3",
+    // the real checkbox stays (keyboard, screen readers); the chip shows its state
+    label:
+      "flex min-h-11 cursor-pointer items-center justify-center rounded-lg border border-muted px-2 py-1 text-center text-sm transition-colors has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:font-medium has-[:checked]:text-on-accent has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent",
+    input: "sr-only",
+    price: "h-11 px-3 text-base",
+  },
+};
 
 const ENTER_KEY = "Enter";
 const COUNT_PLACEHOLDER = "{count}";
@@ -66,35 +97,35 @@ function toPrice(raw: string): number | null {
 function CheckboxGroup({
   legend,
   idPrefix,
+  layout,
   options,
   selected,
   onToggle,
 }: {
   readonly legend: string;
   readonly idPrefix: string;
+  readonly layout: Layout;
   readonly options: readonly Option[];
   readonly selected: readonly SpecValue[];
   readonly onToggle: (value: SpecValue) => void;
 }): React.JSX.Element {
+  const styles = LAYOUT_STYLES[layout];
   return (
     <fieldset className="border-t border-border py-4 first:border-t-0 first:pt-0">
       <legend className="mb-2 text-sm font-semibold">{legend}</legend>
-      <ul className="space-y-0.5">
+      <ul className={styles.list}>
         {options.map((option) => {
           const id = `${idPrefix}-${String(option.value)}`;
           return (
             <li key={id}>
-              {/* the whole row is the click target: at least 24px tall (WCAG 2.5.8) */}
-              <label
-                htmlFor={id}
-                className="flex min-h-7 cursor-pointer items-center gap-2 text-sm"
-              >
+              {/* the whole row/chip is the click target: ≥ 24px (list), 44px (grid) */}
+              <label htmlFor={id} className={styles.label}>
                 <input
                   id={id}
                   type="checkbox"
                   checked={selected.includes(option.value)}
                   onChange={() => onToggle(option.value)}
-                  className="size-4 accent-[var(--mg-accent)]"
+                  className={styles.input}
                 />
                 {option.label}
               </label>
@@ -114,6 +145,7 @@ function FilterControls({
   filters,
   dict,
   scope,
+  layout,
   apply,
 }: ControlsProps): React.JSX.Element {
   const minRef = useRef<HTMLInputElement>(null);
@@ -144,6 +176,7 @@ function FilterControls({
           key={facet.key}
           legend={facet.label[lang]}
           idPrefix={`${scope}-${facet.key}`}
+          layout={layout}
           options={facetOptions(facet, lang)}
           selected={filters.facets[facet.key] ?? []}
           onToggle={(value) =>
@@ -155,6 +188,7 @@ function FilterControls({
       <CheckboxGroup
         legend={dict.brand}
         idPrefix={`${scope}-brand`}
+        layout={layout}
         options={brands.map((b) => ({ value: b, label: b }))}
         selected={filters.brands}
         onToggle={(value) => apply(withBrandToggled(filters, String(value)))}
@@ -163,6 +197,7 @@ function FilterControls({
       <CheckboxGroup
         legend={dict.condition}
         idPrefix={`${scope}-condition`}
+        layout={layout}
         options={CONDITIONS.map((c) => ({
           value: c,
           label: conditionLabels[c],
@@ -189,7 +224,7 @@ function FilterControls({
             defaultValue={filters.priceMin ?? ""}
             onBlur={commitPrice}
             onKeyDown={onPriceKey}
-            className="w-full min-w-0 rounded-lg border border-muted bg-bg px-2 py-1 text-sm"
+            className={`w-full min-w-0 rounded-lg border border-muted bg-bg ${LAYOUT_STYLES[layout].price}`}
           />
           <span aria-hidden className="text-muted">
             –
@@ -205,7 +240,7 @@ function FilterControls({
             defaultValue={filters.priceMax ?? ""}
             onBlur={commitPrice}
             onKeyDown={onPriceKey}
-            className="w-full min-w-0 rounded-lg border border-muted bg-bg px-2 py-1 text-sm"
+            className={`w-full min-w-0 rounded-lg border border-muted bg-bg ${LAYOUT_STYLES[layout].price}`}
           />
         </div>
       </fieldset>
@@ -248,7 +283,7 @@ export function FilterPanel({
   filters,
   dict,
   resultCount,
-}: Omit<ControlsProps, "scope" | "apply"> & {
+}: Omit<ControlsProps, "scope" | "layout" | "apply"> & {
   readonly resultCount: number;
 }): React.JSX.Element {
   const router = useRouter();
@@ -275,7 +310,7 @@ export function FilterPanel({
   return (
     <div>
       <aside aria-label={dict.filters} className="hidden md:block">
-        <FilterControls {...controls} scope="side" />
+        <FilterControls {...controls} scope="side" layout="list" />
       </aside>
 
       <button
@@ -305,7 +340,7 @@ export function FilterPanel({
             </button>
           </div>
           <div className="flex-1 overflow-y-auto px-4 py-4">
-            <FilterControls {...controls} scope="sheet" />
+            <FilterControls {...controls} scope="sheet" layout="grid" />
           </div>
           <div className="border-t border-border p-4">
             <button
