@@ -1,0 +1,7 @@
+# CLI deploys upload the working tree: never send local secrets or scratch files
+.env*
+.neon
+.superpowers
+src/generated
+node_modules
+.next
