@@ -15,6 +15,9 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    # no database in CI: build and tests use the mock catalog (src/lib/catalog/source.ts)
+    env:
+      CATALOG_SOURCE: mock
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
